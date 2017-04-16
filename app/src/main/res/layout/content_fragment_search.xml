@@ -5,21 +5,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.aliveplex.jtdic_on_android.MainActivity"
+    tools:context="com.aliveplex.jtdic_on_android.MainActivity"
     tools:showIn="@layout/fragment_search">
 
-    <EditText
-        android:id="@+id/search_edittext"
-        style="@style/Widget.AppCompat.EditText"
+
+    <FrameLayout
+        android:id="@+id/search_component"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:hint="คำที่ต้องการค้นหา"
-        android:textSize="18sp" />
+        android:layout_marginRight="16dp">
+        <EditText
+            android:id="@+id/search_edittext"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="คำที่ต้องการค้นหา"
+            android:textSize="18sp" />
+        <Button
+            android:id="@+id/clear_search_edittext"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
+            android:layout_gravity="right|center_vertical"
+            android:paddingBottom="8dp"
+            android:background="@drawable/ic_clear_button"
+            android:visibility="gone"/>
+
+    </FrameLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:layout_below="@+id/search_edittext"
+        android:layout_below="@+id/search_component"
         android:id="@+id/search_results_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

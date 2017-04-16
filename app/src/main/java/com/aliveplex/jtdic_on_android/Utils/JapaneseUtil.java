@@ -1,4 +1,4 @@
-package com.example.aliveplex.jtdic_on_android.Utils;
+package com.aliveplex.jtdic_on_android.Utils;
 
 import android.util.Log;
 

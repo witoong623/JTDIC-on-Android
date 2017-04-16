@@ -1,4 +1,4 @@
-package com.example.aliveplex.jtdic_on_android.Listeners;
+package com.aliveplex.jtdic_on_android.Listeners;
 
 import android.content.Context;
 import android.os.Build;
@@ -8,7 +8,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.example.aliveplex.jtdic_on_android.Interfaces.ClickListener;
+import com.aliveplex.jtdic_on_android.Interfaces.ClickListener;
 
 /**
  * Created by Aliveplex on 7/4/2560.

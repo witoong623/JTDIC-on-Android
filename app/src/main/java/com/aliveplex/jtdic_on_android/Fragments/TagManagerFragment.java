@@ -1,4 +1,4 @@
-package com.example.aliveplex.jtdic_on_android.Fragments;
+package com.aliveplex.jtdic_on_android.Fragments;
 
 
 import android.os.Bundle;
@@ -7,7 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.aliveplex.jtdic_on_android.R;
+import com.aliveplex.jtdic_on_android.JTDICApplication;
+import com.aliveplex.jtdic_on_android.R;
+import com.squareup.leakcanary.RefWatcher;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,6 +63,13 @@ public class TagManagerFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_tag_manager, container, false);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        RefWatcher refWatcher = JTDICApplication.getRefWatcher(getActivity());
+        refWatcher.watch(this);
     }
 
 }

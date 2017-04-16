@@ -1,4 +1,4 @@
-package com.example.aliveplex.jtdic_on_android.Fragments;
+package com.aliveplex.jtdic_on_android.Fragments;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -18,17 +18,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.aliveplex.jtdic_on_android.Adapters.WordAdapter;
-import com.example.aliveplex.jtdic_on_android.Constant;
-import com.example.aliveplex.jtdic_on_android.Database.JTDicDb;
-import com.example.aliveplex.jtdic_on_android.Interfaces.ClickListener;
-import com.example.aliveplex.jtdic_on_android.Listeners.RecyclerTouchListener;
-import com.example.aliveplex.jtdic_on_android.Models.JTDicWord;
-import com.example.aliveplex.jtdic_on_android.R;
-import com.example.aliveplex.jtdic_on_android.Utils.JapaneseUtil;
-import com.example.aliveplex.jtdic_on_android.WordDetailActivity;
+import com.aliveplex.jtdic_on_android.Adapters.WordAdapter;
+import com.aliveplex.jtdic_on_android.Constant;
+import com.aliveplex.jtdic_on_android.Database.JTDicDb;
+import com.aliveplex.jtdic_on_android.Interfaces.ClickListener;
+import com.aliveplex.jtdic_on_android.JTDICApplication;
+import com.aliveplex.jtdic_on_android.Listeners.RecyclerTouchListener;
+import com.aliveplex.jtdic_on_android.Models.JTDicWord;
+import com.aliveplex.jtdic_on_android.R;
+import com.aliveplex.jtdic_on_android.Utils.JapaneseUtil;
+import com.aliveplex.jtdic_on_android.WordDetailActivity;
+import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +40,9 @@ import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
+import static butterknife.ButterKnife.bind;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,8 +66,10 @@ public class SearchFragment extends Fragment {
 
     @BindView(R.id.search_results_list)RecyclerView mRecyclerView;
     @BindView(R.id.search_edittext)EditText searchTextbox;
+    @BindView(R.id.clear_search_edittext)Button clearSearchTextbox;
     private WordAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private Unbinder mUnbinder;
 
     public WordAdapter getRecyclerViewAdapter() {
         return mAdapter;
@@ -101,7 +109,7 @@ public class SearchFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
-        ButterKnife.bind(this, view);
+        mUnbinder = ButterKnife.bind(this, view);
 
         mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -126,8 +134,22 @@ public class SearchFragment extends Fragment {
             }
         }));
         searchTextbox.addTextChangedListener(new KeywordTextWatcher(this));
+        clearSearchTextbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchTextbox.setText("");
+            }
+        });
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mUnbinder.unbind();
+        RefWatcher refWatcher = JTDICApplication.getRefWatcher(getActivity());
+        refWatcher.watch(this);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -194,6 +216,13 @@ public class SearchFragment extends Fragment {
 
         @Override
         public void afterTextChanged(final Editable s) {
+            if (s.toString().length() == 0) {
+                searchFragment.clearSearchTextbox.setVisibility(View.GONE);
+                return;
+            }
+
+            searchFragment.clearSearchTextbox.setVisibility(View.VISIBLE);
+
             if (!JapaneseUtil.isJapanese(s.toString())) {
                 return;
             }

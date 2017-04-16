@@ -1,4 +1,4 @@
-package com.example.aliveplex.jtdic_on_android.Adapters;
+package com.aliveplex.jtdic_on_android.Adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,8 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.aliveplex.jtdic_on_android.Models.JTDicWord;
-import com.example.aliveplex.jtdic_on_android.R;
+import com.aliveplex.jtdic_on_android.Models.JTDicWord;
+import com.aliveplex.jtdic_on_android.R;
 
 import java.util.List;
 

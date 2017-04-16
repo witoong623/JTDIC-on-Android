@@ -1,4 +1,4 @@
-package com.example.aliveplex.jtdic_on_android;
+package com.aliveplex.jtdic_on_android;
 
 import org.junit.Test;
 

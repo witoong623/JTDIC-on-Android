@@ -1,4 +1,4 @@
-package com.example.aliveplex.jtdic_on_android;
+package com.aliveplex.jtdic_on_android;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.aliveplex.jtdic_on_android", appContext.getPackageName());
+        assertEquals("com.aliveplex.jtdic_on_android", appContext.getPackageName());
     }
 }

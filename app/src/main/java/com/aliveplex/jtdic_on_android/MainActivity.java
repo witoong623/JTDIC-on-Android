@@ -1,4 +1,4 @@
-package com.example.aliveplex.jtdic_on_android;
+package com.aliveplex.jtdic_on_android;
 
 import android.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -14,8 +14,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.aliveplex.jtdic_on_android.Fragments.SearchFragment;
-import com.example.aliveplex.jtdic_on_android.Fragments.TagManagerFragment;
+import com.aliveplex.jtdic_on_android.Fragments.SearchFragment;
+import com.aliveplex.jtdic_on_android.Fragments.TagManagerFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

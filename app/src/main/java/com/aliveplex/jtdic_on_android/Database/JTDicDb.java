@@ -1,4 +1,4 @@
-package com.example.aliveplex.jtdic_on_android.Database;
+package com.aliveplex.jtdic_on_android.Database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

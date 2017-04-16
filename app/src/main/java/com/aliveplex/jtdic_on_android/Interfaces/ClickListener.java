@@ -1,4 +1,4 @@
-package com.example.aliveplex.jtdic_on_android.Interfaces;
+package com.aliveplex.jtdic_on_android.Interfaces;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

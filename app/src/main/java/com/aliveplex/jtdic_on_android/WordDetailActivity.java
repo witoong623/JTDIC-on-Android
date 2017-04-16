@@ -1,4 +1,4 @@
-package com.example.aliveplex.jtdic_on_android;
+package com.aliveplex.jtdic_on_android;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import com.example.aliveplex.jtdic_on_android.Database.JTDicDb;
+import com.aliveplex.jtdic_on_android.Database.JTDicDb;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

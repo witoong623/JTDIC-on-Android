@@ -1,4 +1,4 @@
-package com.example.aliveplex.jtdic_on_android;
+package com.aliveplex.jtdic_on_android;
 
 /**
  * Created by Aliveplex on 8/4/2560.
