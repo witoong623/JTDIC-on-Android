@@ -1,6 +1,7 @@
 package com.aliveplex.jtdic_on_android;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.support.v7.app.ActionBar;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -13,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 
 import com.aliveplex.jtdic_on_android.Fragments.SearchFragment;
 import com.aliveplex.jtdic_on_android.Fragments.TagManagerFragment;
@@ -88,11 +90,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Fragment f = fragmentManager.findFragmentById(R.id.main_fragment_container);
 
         if (id == R.id.nav_search && !(f instanceof SearchFragment)) {
+            hideKeyboard();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_fragment_container, new SearchFragment());
             fragmentTransaction.commit();
             setActionBarTitle(R.layout.fragment_search);
         } else if (id == R.id.nav_tag_manager && !(f instanceof TagManagerFragment)) {
+            hideKeyboard();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_fragment_container, new TagManagerFragment());
             fragmentTransaction.commit();
@@ -102,6 +106,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         closeDrawer();
 
         return true;
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager inputManager = (InputMethodManager)getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     private void closeDrawer() {

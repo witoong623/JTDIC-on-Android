@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".WordDetailActivity" />
+        <activity android:name=".AddTagActivity"></activity>
     </application>
 
 </manifest>

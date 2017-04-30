@@ -44,66 +44,23 @@ import butterknife.Unbinder;
 
 import static butterknife.ButterKnife.bind;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link SearchFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link SearchFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SearchFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private OnFragmentInteractionListener mListener;
+    private OnFragmentDestroyListener mFragmentDestroyListener;
 
     @BindView(R.id.search_results_list)RecyclerView mRecyclerView;
     @BindView(R.id.search_edittext)EditText searchTextbox;
     @BindView(R.id.clear_search_edittext)Button clearSearchTextbox;
     private WordAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     private Unbinder mUnbinder;
 
     public WordAdapter getRecyclerViewAdapter() {
         return mAdapter;
     }
 
-    public SearchFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SearchFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SearchFragment newInstance(String param1, String param2) {
-        SearchFragment fragment = new SearchFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -111,20 +68,24 @@ public class SearchFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         mUnbinder = ButterKnife.bind(this, view);
 
-        mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), DividerItemDecoration.VERTICAL);
         mRecyclerView.addItemDecoration(mDividerItemDecoration);
         mAdapter = new WordAdapter(new ArrayList<JTDicWord>());
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity().getApplicationContext(), mRecyclerView, new ClickListener() {
+        mRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), mRecyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 Log.d("MainActivity", "item count is " + mAdapter.getItemCount());
                 Log.d("MainActivity", "position is " + position);
                 JTDicWord selectedWord = mAdapter.getWordList().get(position);
-                Intent intent = new Intent(getActivity().getApplicationContext(), WordDetailActivity.class);
+                Intent intent = new Intent(getActivity(), WordDetailActivity.class);
                 intent.putExtra(Constant.JTDICWord_ID, selectedWord.getId());
+                intent.putExtra(Constant.JTDICWord_KANJI, selectedWord.getKanji());
+                intent.putExtra(Constant.JTDICWord_KANA, selectedWord.getKana());
+                intent.putExtra(Constant.JTDICWord_MEANING, selectedWord.getMeaning());
+                intent.putExtra(Constant.JTDICWord_TYPE, selectedWord.getType());
                 startActivity(intent);
             }
 
@@ -133,7 +94,9 @@ public class SearchFragment extends Fragment {
 
             }
         }));
-        searchTextbox.addTextChangedListener(new KeywordTextWatcher(this));
+        KeywordTextWatcher keywordTextWatcher = new KeywordTextWatcher(this);
+        searchTextbox.addTextChangedListener(keywordTextWatcher);
+        mFragmentDestroyListener = keywordTextWatcher;
         clearSearchTextbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,6 +113,7 @@ public class SearchFragment extends Fragment {
         mUnbinder.unbind();
         RefWatcher refWatcher = JTDICApplication.getRefWatcher(getActivity());
         refWatcher.watch(this);
+        mFragmentDestroyListener.onFragmentDestroy();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -191,7 +155,11 @@ public class SearchFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    private static class KeywordTextWatcher implements TextWatcher {
+    public interface OnFragmentDestroyListener {
+        void onFragmentDestroy();
+    }
+
+    private static class KeywordTextWatcher implements TextWatcher, OnFragmentDestroyListener {
         private Timer timer;
         private final long DELAY = 1500;
         private Handler handler = new SearchAndUpdateHandler(Looper.getMainLooper());
@@ -232,7 +200,7 @@ public class SearchFragment extends Fragment {
                 @Override
                 public void run() {
                     String keyword = s.toString();
-                    JTDicDb dbHelper = new JTDicDb(searchFragment.getActivity().getApplicationContext());
+                    JTDicDb dbHelper = new JTDicDb(searchFragment.getActivity());
                     SQLiteDatabase db = dbHelper.getReadableDatabase();
                     String queryString = null;
 
@@ -249,18 +217,26 @@ public class SearchFragment extends Fragment {
                     while (c.moveToNext()) {
                         JTDicWord word = new JTDicWord(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getString(4));
                         adapterWordList.add(word);
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                searchFragment.getRecyclerViewAdapter().notifyDataSetChanged();
-                            }
-                        });
                     }
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            searchFragment.getRecyclerViewAdapter().notifyDataSetChanged();
+                        }
+                    });
 
                     c.close();
                     db.close();
                 }
             }, DELAY);
+        }
+
+        @Override
+        public void onFragmentDestroy() {
+            if (timer != null) {
+                timer.cancel();
+            }
         }
 
         private static class SearchAndUpdateHandler extends Handler {

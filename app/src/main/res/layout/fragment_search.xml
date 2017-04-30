@@ -1,34 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.aliveplex.jtdic_on_android.Fragments.SearchFragment">
-
-    <android.support.design.widget.AppBarLayout
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:addTagActivity="com.aliveplex.jtdic_on_android.MainActivity">
+    <FrameLayout
+        android:id="@+id/search_component"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp">
+        <EditText
+            android:id="@+id/search_edittext"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="wrap_content"
+            android:hint="คำที่ต้องการค้นหา"
+            android:textSize="18sp" />
+        <Button
+            android:id="@+id/clear_search_edittext"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
+            android:layout_gravity="right|center_vertical"
+            android:paddingBottom="8dp"
+            android:background="@drawable/ic_clear_button"
+            android:visibility="gone"/>
 
-    </android.support.design.widget.AppBarLayout>
+    </FrameLayout>
 
-    <include layout="@layout/content_fragment_search" />
-
-    <!-- <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@+id/search_component"
+        android:id="@+id/search_results_list"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" /> -->
-
-</android.support.design.widget.CoordinatorLayout>
-
+        android:scrollbars="vertical" />
+</LinearLayout>
