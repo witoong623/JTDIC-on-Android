@@ -68,6 +68,7 @@ public class WordDetailActivity extends AppCompatActivity {
         LoadDataAsync loadDataAsync = new LoadDataAsync();
         loadDataAsync.execute((Void)null);
 
+        // This RecyclerView holds Tags that were added to this word
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         wordtag_recycler.setLayoutManager(layoutManager);
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(wordtag_recycler.getContext(), DividerItemDecoration.VERTICAL);
@@ -89,11 +90,12 @@ public class WordDetailActivity extends AppCompatActivity {
         @Override
         protected LoadDataAsync.LoadedItems doInBackground(Void... params) {
             List<Tag> availableTagList = new ArrayList<>();
-            List<Tag> wordOfTagList = new ArrayList<>();
+            List<Tag> tagOfWordList = new ArrayList<>();
 
             try {
                 AppDb appDb = new AppDb(WordDetailActivity.this);
                 SQLiteDatabase db = appDb.getReadableDatabase();
+                // Available tag that can be added to this word
                 Cursor c = db.rawQuery("select * from tags", null);
 
                 while (c.moveToNext()) {
@@ -104,10 +106,11 @@ public class WordDetailActivity extends AppCompatActivity {
 
                 c.close();
 
+                // Tags that were added to this word
                 c = db.rawQuery("select tag_text from wordtags inner join tags on tagId = _id where wordId = ?", new String[] { Integer.toString(currentJtdicWord.getId()) });
 
                 while (c.moveToNext()) {
-                    wordOfTagList.add(new Tag(c.getString(0), null));
+                    tagOfWordList.add(new Tag(c.getString(0), null));
                 }
 
                 c.close();
@@ -116,22 +119,27 @@ public class WordDetailActivity extends AppCompatActivity {
                 Log.d("WordDetailActivity", "Exception: " + e.getMessage());
             }
 
-            return new LoadedItems(availableTagList, wordOfTagList);
+            return new LoadedItems(availableTagList, tagOfWordList);
         }
 
         @Override
-        protected void onPostExecute(LoadedItems tagList) {
-            Log.d("WordDetailActivity", "tagList size is " + tagList.size());
-            currentAvailableTag = tagList;
-            List<String> strings = new ArrayList<>(tagList.size());
+        protected void onPostExecute(LoadedItems loadedItems) {
+            // Populate available tag to spinner
+            currentAvailableTag = loadedItems.getAvailableTag();
 
-            for (Tag tag : tagList) {
+            List<String> strings = new ArrayList<>(loadedItems.getAvailableTag().size());
+
+            for (Tag tag : loadedItems.getAvailableTag()) {
                 strings.add(tag.toString());
             }
 
             ArrayAdapter<String> tagArrayAdapter = new ArrayAdapter<>(WordDetailActivity.this, android.R.layout.simple_spinner_item, strings);
             tagArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             tagSpinner.setAdapter(tagArrayAdapter);
+
+            // Populate RecyclerView in which tags were added
+            wordTagadapter.getTagList().addAll(loadedItems.getTagOfWord());
+            wordTagadapter.notifyDataSetChanged();
         }
 
         public class LoadedItems {

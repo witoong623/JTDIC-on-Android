@@ -3,7 +3,6 @@ package com.aliveplex.jtdic_on_android.Listeners;
 import android.content.Context;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -45,10 +44,8 @@ public class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 
     @Override
     public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-        Log.d("RecyclerTouchListener", "onIntercept was called.");
         View child = rv.findChildViewUnder(e.getX(), e.getY());
         if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
-            Log.d("RecyclerTouchListener", "listener's method will be called");
             if (Build.VERSION.SDK_INT >= 22){
                 clickListener.onClick(child, rv.getChildAdapterPosition(child));
             }
@@ -56,9 +53,7 @@ public class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
                 clickListener.onClick(child, rv.getChildPosition(child));
             }
         }
-        else {
-            Log.d("RecyclerTouchListener", "child not found or listener is null or not touch event");
-        }
+
         return false;
     }
 

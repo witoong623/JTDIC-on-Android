@@ -1,6 +1,7 @@
 package com.aliveplex.jtdic_on_android.Adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,7 @@ public class TagListAdapter extends RecyclerView.Adapter<TagListAdapter.TagViewH
         Tag tag = tagList.get(position);
         holder.getTagName().setText(tag.getTagName());
         holder.getTagDescription().setText(tag.getDescription());
+        Log.d("TagListAdapter", "Item bound.");
     }
 
     @Override

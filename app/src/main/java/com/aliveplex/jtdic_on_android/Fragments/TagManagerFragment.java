@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -34,7 +35,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+import static android.app.Activity.RESULT_OK;
+
 public class TagManagerFragment extends Fragment {
+    public static final int CREATE_NEW_TAG = 1000;
+
     @BindView(R.id.tag_list)RecyclerView mRecyclerView;
     @BindView(R.id.fab_add_new_tag)FloatingActionButton mFab;
     private TagListAdapter tagListAdapter;
@@ -52,6 +57,9 @@ public class TagManagerFragment extends Fragment {
         mRecyclerView.addItemDecoration(dividerItemDecoration);
         tagListAdapter = new TagListAdapter(new ArrayList<Tag>());
         mRecyclerView.setAdapter(tagListAdapter);
+        DeleteTagSwipe deleteTagSwipe = new DeleteTagSwipe(0, ItemTouchHelper.LEFT, mRecyclerView);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(deleteTagSwipe);
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
         mRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), mRecyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
@@ -68,7 +76,7 @@ public class TagManagerFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), AddTagActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, CREATE_NEW_TAG);
             }
         });
 
@@ -84,6 +92,17 @@ public class TagManagerFragment extends Fragment {
         mUnbinder.unbind();
         RefWatcher refWatcher = JTDICApplication.getRefWatcher(getActivity());
         refWatcher.watch(this);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CREATE_NEW_TAG && resultCode == RESULT_OK) {
+            Tag tag = new Tag(data.getStringExtra(AddTagActivity.TAG_NAME), data.getStringExtra(AddTagActivity.TAG_DESCRIPTION));
+            tag.setId(data.getIntExtra(AddTagActivity.TAG_ID, -1));
+            int addedPosition = tagListAdapter.getItemCount();
+            tagListAdapter.getTagList().add(tag);
+            tagListAdapter.notifyItemInserted(addedPosition);
+        }
     }
 
     private static class LoadTagListTask extends AsyncTask<Void, Void, List<Tag>> {
@@ -114,16 +133,38 @@ public class TagManagerFragment extends Fragment {
             } finally {
                 db.close();
             }
+            Log.d("TagManagerFragment", "Number of tag: " + tagList.size());
 
             return tagList;
         }
 
         @Override
         protected void onPostExecute(List<Tag> tagList) {
+            Log.d("TagManagerFragment", "Number of tag from onPostExecute: " + tagList.size());
             tagManagerFragment.tagListAdapter.getTagList().addAll(tagList);
-            tagManagerFragment.tagListAdapter.notifyDataSetChanged();
+            tagManagerFragment.tagListAdapter.notifyItemRangeInserted(0, tagList.size());
+        }
+    }
+
+    private static class DeleteTagSwipe extends ItemTouchHelper.SimpleCallback {
+        private RecyclerView recyclerView;
+
+        public DeleteTagSwipe(int dragDirs, int swipeDirs, RecyclerView recyclerView) {
+            super(dragDirs, swipeDirs);
+            this.recyclerView = recyclerView;
         }
 
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            return false;
+        }
 
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            int swipedPosition = viewHolder.getAdapterPosition();
+            TagListAdapter tagListAdapter = (TagListAdapter)recyclerView.getAdapter();
+            tagListAdapter.getTagList().remove(swipedPosition);
+            tagListAdapter.notifyItemRemoved(swipedPosition);
+        }
     }
 }

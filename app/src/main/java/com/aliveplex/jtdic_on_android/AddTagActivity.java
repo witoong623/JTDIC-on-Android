@@ -2,6 +2,7 @@ package com.aliveplex.jtdic_on_android;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -23,6 +24,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class AddTagActivity extends AppCompatActivity {
+    public static final String TAG_ID = "tag_id";
+    public static final String TAG_NAME = "tag_name";
+    public static final String TAG_DESCRIPTION = "tag_description";
+
     @BindView(R.id.toolbar)Toolbar toolbar;
     @BindView(R.id.tag_name_et)TextInputEditText tagNameEt;
     @BindView(R.id.tag_description_et)TextInputEditText tagDescriptionEt;
@@ -89,7 +94,7 @@ public class AddTagActivity extends AppCompatActivity {
                 cursor.close();
 
                 if (isExist) {
-                    return new AddNewTagMessage("Tag name: " + tag.getTagName() + " already exist.", false);
+                    return new AddNewTagMessage("Tag name: " + tag.getTagName() + " already exist.", false, tag);
                 }
 
                 ContentValues row = new ContentValues();
@@ -97,15 +102,16 @@ public class AddTagActivity extends AppCompatActivity {
                 row.put("tag_description", tag.getDescription());
                 long numRow = db.insertOrThrow("tags", null, row);
 
-                if (numRow == 0) {
-                    return new AddNewTagMessage("DB error, can't add new tag.", false);
+                if (numRow == -1) {
+                    return new AddNewTagMessage("DB error, can't add new tag.", false, tag);
                 }
 
-                return new AddNewTagMessage(null, true);
+                tag.setId((int)numRow);
+                return new AddNewTagMessage(null, true, tag);
 
             } catch (Exception e) {
                 Log.d("AddTagActivity", "Exception: " + e.getMessage());
-                return new AddNewTagMessage(e.getMessage(), false);
+                return new AddNewTagMessage(e.getMessage(), false, tag);
             } finally {
                 db.close();
             }
@@ -118,11 +124,17 @@ public class AddTagActivity extends AppCompatActivity {
                 return;
             }
 
+            Intent output = new Intent();
+            output.putExtra(TAG_ID, addNewTagMessage.getTag().getId());
+            output.putExtra(TAG_NAME, addNewTagMessage.getTag().getTagName());
+            output.putExtra(TAG_DESCRIPTION, addNewTagMessage.getTag().getDescription());
+            addTagActivity.setResult(RESULT_OK, output);
             addTagActivity.finish();
         }
 
         public static class AddNewTagMessage {
-            public AddNewTagMessage(String message, boolean isSuccess) {
+            public AddNewTagMessage(String message, boolean isSuccess, Tag tag) {
+                this.tag = tag;
                 this.message = message;
                 this.isSuccess = isSuccess;
             }
@@ -137,6 +149,12 @@ public class AddTagActivity extends AppCompatActivity {
 
             private String message;
             private boolean isSuccess;
+
+            public Tag getTag() {
+                return tag;
+            }
+
+            private Tag tag;
 
 
         }
