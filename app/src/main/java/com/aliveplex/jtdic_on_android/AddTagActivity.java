@@ -20,6 +20,8 @@ import android.view.inputmethod.InputMethodManager;
 import com.aliveplex.jtdic_on_android.Database.AppDb;
 import com.aliveplex.jtdic_on_android.Models.Tag;
 
+import org.joda.time.DateTime;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

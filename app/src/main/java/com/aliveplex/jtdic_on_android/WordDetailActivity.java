@@ -28,6 +28,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -101,16 +103,19 @@ public class WordDetailActivity extends AppCompatActivity {
                 while (c.moveToNext()) {
                     Tag tag = new Tag(c.getString(1), c.getString(2));
                     tag.setId(c.getInt(0));
+                    tag.setRecentUse(DateTime.parse(c.getString(3)));
                     availableTagList.add(tag);
                 }
 
                 c.close();
 
                 // Tags that were added to this word
-                c = db.rawQuery("select tag_text from wordtags inner join tags on tagId = _id where wordId = ?", new String[] { Integer.toString(currentJtdicWord.getId()) });
+                c = db.rawQuery("select tag_text, tag_recent_use from wordtags inner join tags on tagId = _id where wordId = ?", new String[] { Integer.toString(currentJtdicWord.getId()) });
 
                 while (c.moveToNext()) {
-                    tagOfWordList.add(new Tag(c.getString(0), null));
+                    Tag tag = new Tag(c.getString(0), null);
+                    tag.setRecentUse(DateTime.parse(c.getString(1)));
+                    tagOfWordList.add(tag);
                 }
 
                 c.close();
@@ -118,6 +123,8 @@ public class WordDetailActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.d("WordDetailActivity", "Exception: " + e.getMessage());
             }
+            Collections.sort(availableTagList);
+            Collections.sort(tagOfWordList);
 
             return new LoadedItems(availableTagList, tagOfWordList);
         }
@@ -206,6 +213,11 @@ public class WordDetailActivity extends AppCompatActivity {
                 if (numRow == 0) {
                     return false;
                 }
+
+                // update
+                ContentValues recentDate = new ContentValues();
+                recentDate.put(AppDb.TagEntity.TAG_RECENT_USE, "");
+                db.update(AppDb.TagEntity.TAG_RECENT_USE, recentDate, "_id=?", new String[] { Integer.toString(tagId) });
 
                 c.close();
                 db.close();

@@ -14,7 +14,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,6 +26,10 @@ import com.aliveplex.jtdic_on_android.Listeners.RecyclerTouchListener;
 import com.aliveplex.jtdic_on_android.Models.Tag;
 import com.aliveplex.jtdic_on_android.R;
 import com.squareup.leakcanary.RefWatcher;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,12 +121,15 @@ public class TagManagerFragment extends Fragment {
             AppDb appDb = new AppDb(tagManagerFragment.getActivity());
             SQLiteDatabase db = appDb.getReadableDatabase();
 
+            DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+
             try {
                 Cursor cursor = db.rawQuery("select * from tags", null);
 
                 while (cursor.moveToNext()) {
                     Tag tag = new Tag(cursor.getString(1), cursor.getString(2));
                     tag.setId(cursor.getInt(0));
+                    tag.setRecentUse(DateTime.parse(cursor.getString(3)));
                     tagList.add(tag);
                 }
 
