@@ -23,8 +23,8 @@
             android:textSize="18sp" />
         <Button
             android:id="@+id/clear_search_edittext"
-            android:layout_width="23dp"
-            android:layout_height="23dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_gravity="right|center_vertical"
             android:paddingBottom="8dp"
             android:background="@drawable/ic_clear_button"
