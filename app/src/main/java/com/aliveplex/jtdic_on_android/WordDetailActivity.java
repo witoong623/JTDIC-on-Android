@@ -123,8 +123,8 @@ public class WordDetailActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.d("WordDetailActivity", "Exception: " + e.getMessage());
             }
-            Collections.sort(availableTagList);
-            Collections.sort(tagOfWordList);
+            Collections.sort(availableTagList, Collections.<Tag>reverseOrder());
+            Collections.sort(tagOfWordList, Collections.<Tag>reverseOrder());
 
             return new LoadedItems(availableTagList, tagOfWordList);
         }
@@ -216,8 +216,8 @@ public class WordDetailActivity extends AppCompatActivity {
 
                 // update
                 ContentValues recentDate = new ContentValues();
-                recentDate.put(AppDb.TagEntity.TAG_RECENT_USE, "");
-                db.update(AppDb.TagEntity.TAG_RECENT_USE, recentDate, "_id=?", new String[] { Integer.toString(tagId) });
+                recentDate.put(AppDb.TagEntity.TAG_RECENT_USE, fmt.print(new DateTime()));
+                db.update(AppDb.TagEntity.TABLE_NAME, recentDate, "_id=?", new String[] { Integer.toString(tagId) });
 
                 c.close();
                 db.close();
@@ -226,6 +226,8 @@ public class WordDetailActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.d("WordDetailActivity", "Exception: " + e.getMessage());
                 return false;
+            } finally {
+
             }
         }
 
