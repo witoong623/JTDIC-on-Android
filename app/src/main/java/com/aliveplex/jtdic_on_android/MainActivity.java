@@ -52,9 +52,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        }
+        else if (getFragmentManager().getBackStackEntryCount() > 0) {
+            getFragmentManager().popBackStack();
+        }
+        else {
             super.onBackPressed();
         }
     }
@@ -93,12 +98,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             hideKeyboard();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_fragment_container, new SearchFragment());
+            fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
             setActionBarTitle(R.layout.fragment_search);
         } else if (id == R.id.nav_tag_manager && !(f instanceof TagManagerFragment)) {
             hideKeyboard();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_fragment_container, new TagManagerFragment());
+            fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
             setActionBarTitle(R.layout.fragment_tag_manager);
         }
